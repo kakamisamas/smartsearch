@@ -1031,8 +1031,8 @@ def _setup_status_from_values(values: dict[str, str]) -> dict[str, Any]:
 
     status = {
         "main_search": {
-            "configured": [provider for provider in ("xai-responses", "openai-compatible") if provider in main_configured],
-            "fallback_chain": ["xai-responses", "openai-compatible"],
+            "configured": [provider for provider in ("openai-compatible", "xai-responses") if provider in main_configured],
+            "fallback_chain": ["openai-compatible", "xai-responses"],
         },
         "web_search": {
             "configured": [
@@ -1345,7 +1345,7 @@ def _prompt_main_search(values: dict[str, str], current: dict[str, str], lang: s
             "选择 main_search provider",
             "Choose main_search providers",
         ),
-        ["xai-responses", "openai-compatible"],
+        ["openai-compatible", "xai-responses"],
         default_selected,
         lang,
     )

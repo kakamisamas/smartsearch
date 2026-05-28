@@ -398,7 +398,7 @@ async def test_search_uses_xai_responses_for_explicit_xai_config(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_search_fallbacks_from_xai_responses_to_openai_compatible(monkeypatch):
+async def test_search_fallbacks_from_openai_compatible_to_xai_responses(monkeypatch):
     monkeypatch.setenv("XAI_API_KEY", "xai-test-secret")
     monkeypatch.setenv("XAI_MODEL", "xai-model")
     monkeypatch.setenv("OPENAI_COMPATIBLE_API_URL", "https://relay.example.com/v1")
@@ -406,33 +406,33 @@ async def test_search_fallbacks_from_xai_responses_to_openai_compatible(monkeypa
     monkeypatch.setenv("OPENAI_COMPATIBLE_MODEL", "relay-model")
     captured = []
 
-    async def failing_xai(self, query, platform="", ctx=None):
+    async def failing_openai(self, query, platform="", ctx=None):
         captured.append((self.__class__.__name__, self.api_url, self.api_key, self.model))
-        request = httpx.Request("POST", "https://api.x.ai/v1/responses")
-        response = httpx.Response(503, text="responses unavailable", request=request)
-        raise httpx.HTTPStatusError("responses unavailable", request=request, response=response)
+        request = httpx.Request("POST", "https://relay.example.com/v1/chat/completions")
+        response = httpx.Response(503, text="relay unavailable", request=request)
+        raise httpx.HTTPStatusError("relay unavailable", request=request, response=response)
 
-    async def fallback_openai(self, query, platform="", ctx=None):
+    async def fallback_xai(self, query, platform="", ctx=None):
         captured.append((self.__class__.__name__, self.api_url, self.api_key, self.model))
         return 'Fallback answer.\n\nsources([{"url":"https://fallback.example.com","title":"Fallback"}])'
 
-    monkeypatch.setattr(service.XAIResponsesSearchProvider, "search", failing_xai)
-    monkeypatch.setattr(service.OpenAICompatibleSearchProvider, "search", fallback_openai)
+    monkeypatch.setattr(service.OpenAICompatibleSearchProvider, "search", failing_openai)
+    monkeypatch.setattr(service.XAIResponsesSearchProvider, "search", fallback_xai)
 
     result = await service.search("what is example")
 
     assert result["ok"] is True
     assert result["content"] == "Fallback answer."
     assert result["fallback_used"] is True
-    assert [a["provider"] for a in result["provider_attempts"][:2]] == ["xAI Responses", "OpenAI-compatible"]
+    assert [a["provider"] for a in result["provider_attempts"][:2]] == ["OpenAI-compatible", "xAI Responses"]
     assert result["provider_attempts"][0]["status"] == "error"
     assert result["provider_attempts"][1]["status"] == "ok"
-    assert result["primary_api_mode"] == "chat-completions"
-    assert result["model"] == "relay-model"
-    assert result["routing_decision"]["main_search_chain"] == ["xai-responses", "openai-compatible"]
+    assert result["primary_api_mode"] == "xai-responses"
+    assert result["model"] == "xai-model"
+    assert result["routing_decision"]["main_search_chain"] == ["openai-compatible", "xai-responses"]
     assert captured == [
-        ("XAIResponsesSearchProvider", "https://api.x.ai/v1", "xai-test-secret", "xai-model"),
         ("OpenAICompatibleSearchProvider", "https://relay.example.com/v1", "relay-test-secret", "relay-model"),
+        ("XAIResponsesSearchProvider", "https://api.x.ai/v1", "xai-test-secret", "xai-model"),
     ]
 
 

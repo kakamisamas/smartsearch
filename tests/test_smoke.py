@@ -75,7 +75,7 @@ async def test_live_smoke_treats_provider_failure_as_degraded_when_fallback_exis
             "error_type": "",
             "error": "",
             "capability_status": {
-                "main_search": {"configured": ["xai-responses"], "fallback_chain": ["xai-responses", "openai-compatible"], "ok": True},
+                "main_search": {"configured": ["xai-responses"], "fallback_chain": ["openai-compatible", "xai-responses"], "ok": True},
                 "web_search": {"configured": ["zhipu", "tavily"], "fallback_chain": ["zhipu", "tavily", "firecrawl"], "ok": True},
                 "docs_search": {"configured": ["context7"], "fallback_chain": ["context7", "exa"], "ok": True},
                 "web_fetch": {"configured": ["tavily"], "fallback_chain": ["tavily", "firecrawl"], "ok": True},

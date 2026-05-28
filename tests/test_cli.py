@@ -296,7 +296,7 @@ def test_doctor_markdown_outputs_human_health_report(monkeypatch, capsys):
             "minimum_profile_ok": True,
             "minimum_profile_missing": [],
             "capability_status": {
-                "main_search": {"ok": True, "configured": ["openai-compatible"], "fallback_chain": ["xai-responses", "openai-compatible"]},
+                "main_search": {"ok": True, "configured": ["openai-compatible"], "fallback_chain": ["openai-compatible", "xai-responses"]},
                 "docs_search": {"ok": True, "configured": ["context7"], "fallback_chain": ["context7", "exa"]},
                 "web_fetch": {"ok": True, "configured": ["tavily"], "fallback_chain": ["tavily", "firecrawl"]},
             },
@@ -354,7 +354,7 @@ def test_doctor_content_outputs_non_empty_summary(monkeypatch, capsys):
             "config_status": "missing config",
             "minimum_profile_ok": False,
             "capability_status": {
-                "main_search": {"ok": False, "configured": [], "fallback_chain": ["xai-responses", "openai-compatible"]}
+                "main_search": {"ok": False, "configured": [], "fallback_chain": ["openai-compatible", "xai-responses"]}
             },
             "error": "Missing required capability: main_search",
             "error_type": "config_error",
@@ -1726,8 +1726,8 @@ def test_setup_guided_main_search_can_save_both_peer_providers(monkeypatch, caps
         "OPENAI_COMPATIBLE_API_URL": "https://relay.example.com/v1",
         "OPENAI_COMPATIBLE_API_KEY": "relay-test-secret",
     }
-    assert data["capability_status"]["main_search"]["configured"] == ["xai-responses", "openai-compatible"]
-    assert data["capability_status"]["main_search"]["fallback_chain"] == ["xai-responses", "openai-compatible"]
+    assert data["capability_status"]["main_search"]["configured"] == ["openai-compatible", "xai-responses"]
+    assert data["capability_status"]["main_search"]["fallback_chain"] == ["openai-compatible", "xai-responses"]
 
 
 def test_setup_interactive_language_prompt(monkeypatch, capsys):

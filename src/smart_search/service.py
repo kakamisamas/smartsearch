@@ -153,7 +153,7 @@ DEEP_EXA_DISCOVERY_KEYWORDS = {
     "standard",
     "standards",
 }
-MAIN_SEARCH_FALLBACK_CHAIN = ["xai-responses", "openai-compatible"]
+MAIN_SEARCH_FALLBACK_CHAIN = ["openai-compatible", "xai-responses"]
 MAIN_SEARCH_PROVIDER_ALIASES = {
     "xai-responses": {"xai-responses", "xai", "grok", "grok-web-tools"},
     "openai-compatible": {"openai-compatible", "openai", "chat-completions", "primary"},
@@ -2011,7 +2011,7 @@ async def _smoke_mock(start: float) -> dict[str, Any]:
 
     minimum_status = {
         "main_search": {
-            "configured": ["xai-responses", "openai-compatible"],
+            "configured": ["openai-compatible", "xai-responses"],
             "fallback_chain": MAIN_SEARCH_FALLBACK_CHAIN,
             "ok": True,
         },
